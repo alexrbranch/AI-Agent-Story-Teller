@@ -3,3 +3,7 @@
 2. Modularized the agent construction. Created a class to spin up new agents with unique systems prompts and temperatures. 
 
 3. Request user inputs for a story theme and the name of the main character. A single storyteller agent outputs a typical story with a "once upon a time" introduction. Typical story, not much creativity/variety.
+
+4. Added an outliner agent. Tested independently to validate the json output of the story structure. The storyteller handles the json outline well and produces a well structured story.
+
+5. Added logging to save agent outputs for debugging later.
