@@ -7,3 +7,5 @@
 4. Added an outliner agent. Tested independently to validate the json output of the story structure. The storyteller handles the json outline well and produces a well structured story.
 
 5. Added logging to save agent outputs for debugging later.
+
+6. A judge now reviews the story at the very end and provides metrics for letter grade, age suitability, vocabulary analysis, critiques, and if the story is kid-safe.

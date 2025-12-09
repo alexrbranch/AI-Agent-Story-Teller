@@ -22,12 +22,13 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
 class Agent:
-    def __init__(self, role_name, system_prompt, model=configs.MODEL_NAME):
+    def __init__(self, role_name, system_prompt, model=configs.MODEL_NAME, temperature=0.5):
         self.role = role_name
         self.system_prompt = system_prompt
         self.model = model
-
-    def call_model(self, prompt: str, max_tokens=3000, temperature=0.5) -> str:
+        self.temperature = temperature
+        
+    def call_model(self, prompt: str, max_tokens=3000) -> str:
         print(f"[{self.role}] Thinking...")
 
         resp = client.chat.completions.create(
@@ -36,7 +37,7 @@ class Agent:
                 {"role": "system", "content": self.system_prompt},
                 {"role": "user", "content": prompt}],
             max_tokens=max_tokens,
-            temperature=temperature,
+            temperature=self.temperature,
         )
         return resp.choices[0].message.content
 
@@ -62,14 +63,18 @@ def main():
     logger.info("User request: \n{user_request}")
 
     outliner = Agent(role_name="Outliner", system_prompt=configs.OUTLINER_SYSTEM_PROMPT)
-    outline_raw = outliner.call_model(user_request) #json output
+    outline_raw = outliner.call_model(user_request,) #json output
     logger.info(f"Outline raw: \n{outline_raw}")
 
     storyteller = Agent(role_name="Storyteller", system_prompt=configs.WRITER_SYSTEM_PROMPT)
     story_content = storyteller.call_model(outline_raw)
     logger.info(f"Story content: \n{story_content}")
+
+    judge = Agent(role_name="Judge", system_prompt=configs.JUDGE_SYSTEM_PROMPT)
+    judge_result = judge.call_model(story_content)
+    logger.info(f"Judge result: \n{judge_result}")
     
-    save_story(story_content)
+    save_story(story_content + "\n\n" + judge_result)
 
 
 if __name__ == "__main__":
