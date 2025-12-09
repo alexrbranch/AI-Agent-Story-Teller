@@ -15,3 +15,8 @@
 8. Built outliner loop to agenticly improve the outline. Added a max iterations of 3 and a low temperature on the editor to encourage objective feedback. With each iteration, send back the rejected outline, critique, and the user's story request. The outline editor accepts almost every outline. Need to make it more critical. Forcing denial every time lets the outline iterate MAX_RETRIES times.
 
 9. Modularized the feedback loop function to be useable by story editor. Added story critic and some more customs schemas for critics, story.
+
+10. Added an idea generation agents to create 3 separate ideas based on the theme. This lets the user define their ideal story.
+
+OBERSERVATIONS:
+The final judge gave increasingly better letter grades as I created more feedback loops. The outline and story were more refined.

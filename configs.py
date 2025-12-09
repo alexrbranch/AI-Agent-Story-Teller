@@ -11,7 +11,11 @@ LOG_FILE = "system.log"
 
 IDEA_SYSTEM_PROMPT = """
 You are a creative brainstorming assistant.
-Generate 3 distinct, fun story concepts for a 5-10 year old child based on the user's theme.
+Generate 3 distinct, fun story concepts for a 5-10 year old child BASED on the user's theme.
+Do not use any character names in the story concepts. 
+
+Rules:
+1. The story concepts must be related to the provided theme
 """
 
 OUTLINER_SYSTEM_PROMPT = """

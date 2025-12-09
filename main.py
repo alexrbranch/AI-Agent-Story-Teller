@@ -126,17 +126,31 @@ def feedback_loop(generator_agent, judge_agent, initial_prompt):
 
     logger.info(f"Max iterations reached. Returning last rejected outline.")
     return current_task[0]
-        
-
 
 
 def main():
-    start_time = time.time()
     logger.info(f"\n\n\n\n[{time.strftime('%Y-%m-%d %H:%M:%S')}] Starting storyteller...")
 
-    name, theme = get_user_inputs()
-    user_request = f"Create a story about {theme} with the main character {name}."
+    theme, name = get_user_inputs()
 
+    idea_agent = Agent(role_name="Idea Generator", system_prompt=configs.IDEA_SYSTEM_PROMPT, response_schema=schemas.IdeaList)
+    prompt = f"Generate 3 story ideas which MUST be based on the theme: '{theme}'."
+    idea_list = idea_agent.call_model(prompt, temperature=0.8) # higher temperature for creativity
+    logging.info(f"Idea List: {idea_list.model_dump_json()}")
+
+
+    print("\n--- SELECT A STORY CONCEPT ---")
+    for i, idea in enumerate(idea_list.ideas):
+        print(f"{i+1}. {idea.summary}")
+    
+    choice = input(f"\nSelect Number (1-{len(idea_list.ideas)}): ")
+    try:
+        selected_idea = idea_list.ideas[int(choice)-1]
+    except:
+        print("Invalid selection. Defaulting to idea 1")
+        selected_idea = idea_list.ideas[0]
+
+    user_request = f"Create an outline for the story summarized here: {selected_idea.summary} with a main character named {name}."
 
     # OUTLINE FEEDBACK LOOP
     outliner = Agent(role_name="Outliner", system_prompt=configs.OUTLINER_SYSTEM_PROMPT, response_schema=schemas.StoryOutline)
@@ -148,6 +162,7 @@ def main():
     story_editor = Agent(role_name="Story Editor", system_prompt=configs.STORY_EDITOR_SYSTEM_PROMPT, response_schema=schemas.Critique)
     story_content = feedback_loop(storyteller, story_editor, outline_refined.model_dump_json())
 
+    # FINAL JUDGE TO ASSIGN A LETTER GRADE AND FINAL FEEDBACK
     judge = Agent(role_name="Judge", system_prompt=configs.JUDGE_SYSTEM_PROMPT, response_schema=schemas.StoryGrade)
     judge_result = judge.call_model(story_content)
     
