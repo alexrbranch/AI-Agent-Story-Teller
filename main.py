@@ -12,6 +12,10 @@ import schemas
 """
 Before submitting the assignment, describe here in a few sentences what you would have built next if you spent 2 more hours on this project:
 
+Guardrails: I would use a smaller model to implement guardrails. Currently, the prompting works to remove harmful content, but a dedicated model would make this more robust.
+Text to Speech: I would add a text to speech feature to the storyteller. Enables the child to listen to the story in bed.
+Choose your own adventure: Can extend this to break the story at certain points and request a decision from the child on what to do next. 
+    This is even better than traditional choose your own adventure books because it will be interactive and dynamically generated. 
 """
 
 # Simple logger: root config only
@@ -101,6 +105,7 @@ def feedback_loop(generator_agent, judge_agent, initial_prompt):
     
     iterations = 0
     current_task = initial_prompt
+    content = None
     # Improvement loop
     while iterations < configs.MAX_ITERATIONS:
         iterations += 1
@@ -119,13 +124,14 @@ def feedback_loop(generator_agent, judge_agent, initial_prompt):
         else:
             logger.info(f"{generator_agent.role} REJECTED on {iterations} iteration")
             current_task = (
-                f"Previous Rejected Outline: {content.model_dump_json()}\n",
+                f"Previous attempt reject: {content.model_dump_json()}\n",
                 f"Critique: {critique.critique_text}\n",
                 f"Original prompt: {initial_prompt}\n",
+                f"INSTRUCTION: Generate a new version that fixes these specific issues."
             )
 
     logger.info(f"Max iterations reached. Returning last rejected outline.")
-    return current_task[0]
+    return content
 
 
 def main():

@@ -17,9 +17,9 @@ class StoryOutline(BaseModel):
     resolution: str = Field(description="How it ends and the lesson learned by the main character")
 
 class Critique(BaseModel):
-    approved: bool = Field(description="Set to True ONLY if the outline is safe and follows logic. False otherwise.")
-    critique_text: str = Field(description="Specific feedback on what to do next time for a better story.")
-    safety_score: int = Field(description="1-10 safety score, 10 is safest.")
+    reasoning: str = Field(description="Step by step reasoning about the story and tone.")
+    critique_text: str = Field(description="Specific feedback on what to do next time for a better story. If approved, write 'None'")
+    approved: bool = Field(description="Set to False if ANY changes are needed. True only if perfect.")
 
 class StoryDraft(BaseModel):
     title: str

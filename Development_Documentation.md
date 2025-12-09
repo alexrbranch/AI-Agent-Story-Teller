@@ -18,5 +18,11 @@
 
 10. Added an idea generation agents to create 3 separate ideas based on the theme. This lets the user define their ideal story.
 
+11. Change the order of the Critique schema. Tell the model to reason about the text first. The old version had approved first, so it would make an approval decision before understanding the critiques 
+
+12. Changed editor system prompts to take an adversarial stance has opposed to a "friendly and helpful" editor. This forced more iteration on writing.
+
 OBERSERVATIONS:
 The final judge gave increasingly better letter grades as I created more feedback loops. The outline and story were more refined.
+
+Editors tend to give everything a greenlight. Need to have editors take an adversarial role again the writers.

@@ -2,7 +2,7 @@ MODEL_NAME = "gpt-3.5-turbo"
 TEMPERATURE_OUTLINER = 0.5 
 TEMPERATURE_WRITER = 0.7
 TEMPERATURE_JUDGE = 0.1
-TEMPERATURE_EDITOR = 0.2
+TEMPERATURE_EDITOR = 0.0
 
 MAX_ITERATIONS = 3
 
@@ -26,11 +26,16 @@ You do not outliner plots that may be too scary for a child trying to fall aslee
 """
 
 OUTLINE_EDITOR_SYSTEM_PROMPT = """
-You are a helpful editor that improves story outlines for children ages 5-10.
-You should be strict here and can make any changes you want to the story to make it better.
-Do not allow the story outline to discuss any dangerous topics or scary content. No weapons, violence, or sexual themes.
-Propose changes to the outline to make it safer and more appropriate for a child.
-Only approve a perfect outline.
+You are a strict senior editor for a children's book publisher.
+Your goal is to FIND FLAWS in the outline.
+
+Check for:
+1. Plot Holes: Does the story make sense?
+2. Safety: Is there any violence or scary elements? (Strict Zero Tolerance)
+3. Complexity: Is the plot too confusing for a child?
+
+If you find no more issues, set 'approved' to True.
+Only approve if it is perfect.
 """
 
 WRITER_SYSTEM_PROMPT = """
@@ -47,11 +52,15 @@ Rules:
 """
 
 STORY_EDITOR_SYSTEM_PROMPT = """
-You are a helpful editor that improves story outlines for children ages 5-10.
-You should be strict here and can make any changes you want to the story to make it better.
-Do not allow the story outline to discuss any dangerous topics or scary content. No weapons, violence, or sexual themes.
-Propose changes to the outline to make it safer and more appropriate for a child.
-Only approve a perfect outline.
+You are a strict senior editor for a children's book publisher.
+Review the story draft for style and safety.
+
+Critique Rules:
+1. Vocabulary: If there are words a 7-year-old wouldn't know, REJECT it.
+2. Pacing: If the story feels rushed, REJECT it.
+3. Safety: If there is any fighting or scariness, REJECT it.
+
+If you have any suggestions for improvement, you set 'approved' to False.
 """
 
 JUDGE_SYSTEM_PROMPT = """
