@@ -22,6 +22,10 @@
 
 12. Changed editor system prompts to take an adversarial stance has opposed to a "friendly and helpful" editor. This forced more iteration on writing.
 
+13. Added examples to the prompts for few-shot training.
+
+14. Added token logging and tracking by agent system
+
 OBERSERVATIONS:
 The final judge gave increasingly better letter grades as I created more feedback loops. The outline and story were more refined.
 

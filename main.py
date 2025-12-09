@@ -13,14 +13,45 @@ import schemas
 Before submitting the assignment, describe here in a few sentences what you would have built next if you spent 2 more hours on this project:
 
 Guardrails: I would use a smaller model to implement guardrails. Currently, the prompting works to remove harmful content, but a dedicated model would make this more robust.
-Text to Speech: I would add a text to speech feature to the storyteller. Enables the child to listen to the story in bed.
 Choose your own adventure: Can extend this to break the story at certain points and request a decision from the child on what to do next. 
     This is even better than traditional choose your own adventure books because it will be interactive and dynamically generated. 
 """
 
-# Simple logger: root config only
+
 logging.basicConfig(level=logging.INFO, filename=configs.LOG_FILE)
 logger = logging.getLogger("Storyteller")
+
+TOKEN_USAGE = {
+    "idea": {"prompt": 0, "completion": 0, "total": 0},
+    "outline": {"prompt": 0, "completion": 0, "total": 0},
+    "story": {"prompt": 0, "completion": 0, "total": 0},
+    "judge": {"prompt": 0, "completion": 0, "total": 0},
+}
+
+def categorize_role(role_name: str) -> str:
+    role_lower = role_name.lower()
+    if "idea" in role_lower:
+        return "idea"
+    if "outline" in role_lower:
+        return "outline"
+    if "story" in role_lower:
+        return "story"
+    if "judge" in role_lower:
+        return "judge"
+    return "judge"
+
+
+def update_token_usage(usage, role_name: str):
+    if not usage:
+        return
+    prompt = getattr(usage, "prompt_tokens", 0) or 0
+    completion = getattr(usage, "completion_tokens", 0) or 0
+    total = getattr(usage, "total_tokens", prompt + completion) or 0
+    bucket = categorize_role(role_name)
+    TOKEN_USAGE[bucket]["prompt"] += prompt
+    TOKEN_USAGE[bucket]["completion"] += completion
+    TOKEN_USAGE[bucket]["total"] += total
+
 
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -70,6 +101,7 @@ class Agent:
             request_args["tool_choice"] = {"type": "function", "function": {"name": "provide_output"}}
 
         resp = client.chat.completions.create(**request_args)
+        update_token_usage(getattr(resp, "usage", None), self.role)
 
         # If no pydantic schema, just return the content
         if not self.response_schema:
@@ -173,6 +205,13 @@ def main():
     judge_result = judge.call_model(story_content)
     
     save_story("Title: " + story_content.title + "\n" + story_content.content + "\n\n" + judge_result.model_dump_json())
+    
+    summary_lines = []
+    for bucket_label, data in TOKEN_USAGE.items():
+        summary_lines.append(f"{bucket_label}: input={data['prompt']}, output={data['completion']}, total={data['total']}")
+    token_summary = "\nToken usage: " + "\n".join(summary_lines)
+    logger.info(token_summary)
+    print(token_summary)
 
 
 if __name__ == "__main__":

@@ -36,6 +36,22 @@ Check for:
 
 If you find no more issues, set 'approved' to True.
 Only approve if it is perfect.
+
+<example>
+
+Negative (Not Approved)
+{
+  "approved": False,
+  "critique_text": "The outline introduces a villain who chases the main character, which might be too scary for young children. Additionally, the ending is abrupt and lacks proper resolution."
+}
+
+Positive (Approved)
+{
+  "approved": True,
+  "critique_text": "The outline is logical, cheerful, and age-appropriate. No plot holes or scary elements found. Plot is easy to follow and suitable for a bedtime story."
+}
+</example>
+
 """
 
 WRITER_SYSTEM_PROMPT = """
@@ -61,6 +77,21 @@ Critique Rules:
 3. Safety: If there is any fighting or scariness, REJECT it.
 
 If you have any suggestions for improvement, you set 'approved' to False.
+
+<example>
+
+Negative (Not Approved)
+{
+  "approved": False,
+  "critique_text": "The outline introduces a villain who chases the main character, which might be too scary for young children. Additionally, the ending is abrupt and lacks proper resolution."
+}
+
+Positive (Approved)
+{
+  "approved": True,
+  "critique_text": "The outline is logical, cheerful, and age-appropriate. No plot holes or scary elements found. Plot is easy to follow and suitable for a bedtime story."
+}
+</example>
 """
 
 JUDGE_SYSTEM_PROMPT = """
