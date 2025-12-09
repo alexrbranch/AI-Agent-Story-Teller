@@ -1,7 +1,7 @@
-## AI Agent Story teller
+## AI Agent Story Teller
 Thank you for this opportunity and I hope to hear back soon.
 
-I built an agent storyteller with two generator-critic systems. 
+I built an agentic storyteller with two generator-critic systems. 
 
 The first builds an outline for the story. 
 The second is the prose system.
