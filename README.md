@@ -12,6 +12,8 @@ There is also an agent that generates 3 story ideas to give the user input on th
 
 At the end of the script, I attached a judge which scores the essay with a letter grade and provides a short review.
 
+I included a PNG of the system design and another document, Development_Documentation.md, where I wrote down design decisions and observations, as you would need to when developing system medical-use AI.
+
 ## How to run
 
 1) Ensure you Python 3.10+  
