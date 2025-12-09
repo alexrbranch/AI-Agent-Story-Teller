@@ -96,33 +96,32 @@ def save_story(content):
     print(f"Story saved to {configs.STORY_OUTPUT_FILE}")
 
 
-# Logic loop for the outline improvement
-def outliner_flow(user_request):
-    outliner = Agent(role_name="Outliner", system_prompt=configs.OUTLINER_SYSTEM_PROMPT, response_schema=schemas.StoryOutline)
-    editor = Agent(role_name="Outline Editor", system_prompt=configs.EDITOR_SYSTEM_PROMPT, response_schema=schemas.Critique)
-
+# Logic loop for the feedback improvement. Works for both outline and story.
+def feedback_loop(generator_agent, judge_agent, initial_prompt):
+    
     iterations = 0
-    current_task = user_request
+    current_task = initial_prompt
     # Improvement loop
     while iterations < configs.MAX_ITERATIONS:
         iterations += 1
-        print(current_task)
-        # Generate outline
-        outline = outliner.call_model(user_request)
-        # Edit the outline
-        judge_input = f"Evaluate this outline for safety/logic: {outline.model_dump_json()}"
-        critique = editor.call_model(judge_input, temperature=configs.TEMPERATURE_EDITOR)
+
+        # Generate the content
+        content = generator_agent.call_model(current_task)
+
+        # Critic the content
+        critic_input = f"Review this: {content.model_dump_json()}"
+        critique = judge_agent.call_model(critic_input, temperature=0.0)
 
         # Editor decideds what to do next
         if critique.approved:
-            logger.info(f"Outline APPROVED after {iterations} iterations")
-            return outline
+            logger.info(f"{generator_agent.role} APPROVED after {iterations} iterations")
+            return content
         else:
-            logger.info(f"Outline REJECTED on {iterations} iteration")
+            logger.info(f"{generator_agent.role} REJECTED on {iterations} iteration")
             current_task = (
-                f"Previous Rejected Outline: {outline.model_dump_json()}\n",
+                f"Previous Rejected Outline: {content.model_dump_json()}\n",
                 f"Critique: {critique.critique_text}\n",
-                f"Original User Request: {user_request}\n",
+                f"Original prompt: {initial_prompt}\n",
             )
 
     logger.info(f"Max iterations reached. Returning last rejected outline.")
@@ -138,15 +137,21 @@ def main():
     name, theme = get_user_inputs()
     user_request = f"Create a story about {theme} with the main character {name}."
 
-    outline_refined = outliner_flow(user_request)
 
-    storyteller = Agent(role_name="Storyteller", system_prompt=configs.WRITER_SYSTEM_PROMPT)
-    story_content = storyteller.call_model(outline_refined)
+    # OUTLINE FEEDBACK LOOP
+    outliner = Agent(role_name="Outliner", system_prompt=configs.OUTLINER_SYSTEM_PROMPT, response_schema=schemas.StoryOutline)
+    outline_editor = Agent(role_name="Outline Editor", system_prompt=configs.OUTLINE_EDITOR_SYSTEM_PROMPT, response_schema=schemas.Critique)
+    outline_refined = feedback_loop(outliner, outline_editor, user_request)
 
-    judge = Agent(role_name="Judge", system_prompt=configs.JUDGE_SYSTEM_PROMPT)
+    # STORY FEEDBACK LOOP
+    storyteller = Agent(role_name="Storyteller", system_prompt=configs.WRITER_SYSTEM_PROMPT, response_schema=schemas.StoryDraft)
+    story_editor = Agent(role_name="Story Editor", system_prompt=configs.STORY_EDITOR_SYSTEM_PROMPT, response_schema=schemas.Critique)
+    story_content = feedback_loop(storyteller, story_editor, outline_refined.model_dump_json())
+
+    judge = Agent(role_name="Judge", system_prompt=configs.JUDGE_SYSTEM_PROMPT, response_schema=schemas.StoryGrade)
     judge_result = judge.call_model(story_content)
     
-    save_story(story_content + "\n\n" + judge_result)
+    save_story("Title: " + story_content.title + "\n" + story_content.content + "\n\n" + judge_result.model_dump_json())
 
 
 if __name__ == "__main__":

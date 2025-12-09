@@ -13,3 +13,5 @@
 7. Use pydantic for type enforcement. This, with openai tools, will give a structural guarantee of each agent's output to make flow more deterministic. (Also dont need to include JSON requesting in system prompts as its now forced)
 
 8. Built outliner loop to agenticly improve the outline. Added a max iterations of 3 and a low temperature on the editor to encourage objective feedback. With each iteration, send back the rejected outline, critique, and the user's story request. The outline editor accepts almost every outline. Need to make it more critical. Forcing denial every time lets the outline iterate MAX_RETRIES times.
+
+9. Modularized the feedback loop function to be useable by story editor. Added story critic and some more customs schemas for critics, story.
